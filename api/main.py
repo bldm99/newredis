@@ -105,23 +105,17 @@ def recibir_datos():
         newx = resul['movieId'].drop_duplicates() #elimanmos peliculas que el usauario ya vio
 
         #covertmos los resultados de las peliculas a diccionario
-        valores_unicos = newx.values
+        recomendada_df = pd.DataFrame({'movieId': newx})
+        recomendada_df = recomendada_df.head(30)
+        lista_tuplas = [(i, movie_id) for i, movie_id in enumerate(recomendada_df['movieId'])]
 
-        diccionario_recomendada = {1:2  ,3:4}
-        for indice, valor in enumerate(valores_unicos):
-            diccionario_recomendada[indice + 1] = valor
-            if indice == 29:  
-                break
-        peliculasp = diccionario_recomendada
+        datarecomend = dict(lista_tuplas)
+        peliculasp = datarecomend
 
         
-        #dictionary_final = dict(zip(newx.index, newx.values))
-        #peliculasp = dictionary_final
-
+    
 
         redis_conn.set('valoresfinal', json.dumps(valoresfinal))
-        #redis_conn.set('peliculas', json.dumps(peliculasp))
-        #redis_conn.set('peliculas', json.dumps(dictionary_final))
         redis_conn.set('peliculas', json.dumps(peliculasp))
 
         return jsonify(valoresfinal)
@@ -147,6 +141,9 @@ def get_peliculas():
         return jsonify(json.loads(peliculas_cached))
     else:
         return jsonify({"mensaje": "No hay peliculas finales almacenados en Redis"})
+
+
+  
     
 
 @app.route('/api/csv', methods=['GET'])
